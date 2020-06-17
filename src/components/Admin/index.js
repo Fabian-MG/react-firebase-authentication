@@ -1,11 +1,11 @@
-import React from 'react'
+import React from "react";
 
 const Admin = () => {
-    return (
-        <div>
-            
-        </div>
-    )
-}
+  return (
+    <div>
+      <h1>Administration Page</h1>
+    </div>
+  );
+};
 
-export default Admin
+export default Admin;
