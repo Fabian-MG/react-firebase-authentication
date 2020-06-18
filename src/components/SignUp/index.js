@@ -2,20 +2,20 @@ import React, { useContext, useState } from "react";
 
 import { SIGN_UP, HOME } from "../../constants/routes";
 import { FirebaseContext } from "../Firebase/context";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 
 import "./Sign-Up.scss";
 
-const SignUpPage = ({ history }) => {
+const SignUpPage = () => {
   return (
     <div className="sign-up-page">
       <h1>Sign Up to Start!</h1>
-      <SignUpForm history={history} />
+      <SignUpForm />
     </div>
   );
 };
 
-const SignUpForm = ({ history }) => {
+const SignUpFormBase = ({ history }) => {
   const initialState = {
     username: "",
     email: "",
@@ -55,7 +55,6 @@ const SignUpForm = ({ history }) => {
 
   return (
     <form className="sign-up-form" onSubmit={handleSubmit}>
-      {console.log(firebase)}
       <input
         name="username"
         value={username}
@@ -101,6 +100,8 @@ const SignUpLink = () => (
     Don´t have an account? <Link to={SIGN_UP}> Sign Up </Link>
   </p>
 );
+
+const SignUpForm = withRouter(SignUpFormBase)
 
 export default SignUpPage;
 

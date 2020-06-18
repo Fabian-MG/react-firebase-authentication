@@ -19,27 +19,26 @@ import PasswordForgetPage from "../PasswordForget";
 import HomePage from "../Home";
 import AccountPage from "../Account";
 import AdminPage from "../Admin";
+import { withAuthentication } from "../Session";
 
 //stylesheet
 import "./App.scss";
-import FirebaseContextProvider from "../Firebase/context";
+
 const App = () => {
   return (
     <div className="App">
-      <FirebaseContextProvider>
-        <Navigation />
-        <Switch>
-          <Route exact path={LANDING} component={LandingPage} />
-          <Route exact path={SIGN_UP} component={SignUpPage} />
-          <Route exact path={SIGN_IN} component={SignInPage} />
-          <Route exact path={PASSWORD_FORGET} component={PasswordForgetPage} />
-          <Route exact path={HOME} component={HomePage} />
-          <Route exact path={ACCOUNT} component={AccountPage} />
-          <Route exact path={ADMIN} component={AdminPage} />
-        </Switch>
-      </FirebaseContextProvider>
+      <Navigation />
+      <Switch>
+        <Route exact path={LANDING} component={LandingPage} />
+        <Route exact path={SIGN_UP} component={SignUpPage} />
+        <Route exact path={SIGN_IN} component={SignInPage} />
+        <Route exact path={PASSWORD_FORGET} component={PasswordForgetPage} />
+        <Route exact path={HOME} component={HomePage} />
+        <Route exact path={ACCOUNT} component={AccountPage} />
+        <Route exact path={ADMIN} component={AdminPage} />
+      </Switch>
     </div>
   );
 };
 
-export default App;
+export default withAuthentication(App);
