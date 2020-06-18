@@ -1,20 +1,20 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 
 import { LANDING, SIGN_IN, HOME, ACCOUNT } from "../../constants/routes";
 
-import "./Navigation.scss";
 import SignOutButton from "../SignOut";
 import { AuthUserContext } from "../Session";
 
-const Navigation = () => {
-  const { authUser } = useContext(AuthUserContext)
-  return (
-    <div className="Navbar">
-      {authUser ? <NavigationAuth /> : <NavigationNonAuth />}
-    </div>
-  );
-};
+import "./Navigation.scss";
+
+const Navigation = () => (
+  <div className="Navbar">
+    <AuthUserContext.Consumer>
+      {(authUser) => (authUser ? <NavigationAuth /> : <NavigationNonAuth />)}
+    </AuthUserContext.Consumer>
+  </div>
+);
 
 const NavigationAuth = () => (
   <ul>

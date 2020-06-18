@@ -1,4 +1,4 @@
-.sign-up-page {
+.account-page {
   width: 99.7%;
   height: 91%;
   display: flex;
@@ -7,13 +7,14 @@
   flex-direction: column;
 
   h1 {
-    font-size: 3rem;
+    font-size: 3.5rem;
     font-weight: bold;
-    color: #3b719f;
+    color: #1f3b4d;
   }
-  .sign-up-form {
+
+  .password-forget-form {
     width: 35%;
-    margin-top: 10px;
+    margin-bottom: 30px;
     border-radius: 6px;
     overflow: hidden;
     box-shadow: 0px 9px 17px 0px rgba(0, 0, 0, 0.75);

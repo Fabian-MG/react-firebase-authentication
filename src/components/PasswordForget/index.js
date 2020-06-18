@@ -1,10 +1,10 @@
-import React, { useState, useContext } from "react";
-
-import { FirebaseContext } from "../Firebase/context";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+
 import { PASSWORD_FORGET } from "../../constants/routes";
 
 import "./Password-forget.scss";
+import { withFirebase } from "../Firebase";
 
 const PasswordForgetPage = () => {
   return (
@@ -20,12 +20,11 @@ const PasswordForgetPage = () => {
   );
 };
 
-const PasswordForgetForm = () => {
+const PasswordForgetFormBase = ({ firebase }) => {
   const initialState = {
     email: "",
     error: null,
   };
-  const { firebase } = useContext(FirebaseContext);
   const [credentials, setCredentials] = useState(initialState);
   const { email, error } = credentials;
 
@@ -57,6 +56,7 @@ const PasswordForgetForm = () => {
         value={email}
         onChange={handleChange}
         type="text"
+        required
         placeholder="Email Address"
       />
       <button
@@ -83,4 +83,7 @@ const PasswordForgetLink = () => (
 );
 
 export default PasswordForgetPage;
+
+const PasswordForgetForm = withFirebase(PasswordForgetFormBase);
+
 export { PasswordForgetForm, PasswordForgetLink };

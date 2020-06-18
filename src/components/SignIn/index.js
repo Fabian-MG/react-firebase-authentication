@@ -1,12 +1,13 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { withRouter } from "react-router-dom";
 
-import { FirebaseContext } from "../Firebase/context";
 import { HOME } from "../../constants/routes";
 import { SignUpLink } from "../SignUp";
 import { PasswordForgetLink } from "../PasswordForget";
 
 import "./Sign-in.scss";
+import { compose } from "recompose";
+import { withFirebase } from "../Firebase";
 
 const SignInPage = () => {
   return (
@@ -19,12 +20,11 @@ const SignInPage = () => {
   );
 };
 
-const SignInFormBase = ({ history }) => {
+const SignInFormBase = ({ history, firebase }) => {
   const initialState = {
     email: "",
     password: "",
   };
-  const { firebase } = useContext(FirebaseContext);
   const [userCredentials, setUserCredentials] = useState(initialState);
   const [error, setError] = useState(null);
   const { email, password } = userCredentials;
@@ -58,7 +58,7 @@ const SignInFormBase = ({ history }) => {
         name="email"
         value={email}
         onChange={handleChange}
-        type="text"
+        type="email"
         placeholder="Email Address"
       />
       <input
@@ -80,7 +80,7 @@ const SignInFormBase = ({ history }) => {
   );
 };
 
-const SignInForm = withRouter(SignInFormBase);
+const SignInForm = compose(withRouter, withFirebase)(SignInFormBase);
 
 export default SignInPage;
 

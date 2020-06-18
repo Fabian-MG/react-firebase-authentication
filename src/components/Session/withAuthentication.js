@@ -1,28 +1,36 @@
-import React, { useContext, useState, useEffect } from "react";
-import { FirebaseContext } from "../Firebase/context";
+import React from "react";
 import AuthUserContext from "./context";
+import { withFirebase } from "../Firebase";
 
-const withAuthentication = (WrappedComponent) => ({ ...otherProps }) => {
-  const { firebase } = useContext(FirebaseContext);
-  const [authUser, setAuthUser] = useState(null);
-
-  useEffect(() => {
-    firebase.auth.onAuthStateChanged((user) => {
-      user ? setAuthUser(user) : setAuthUser(null);
-    });
-
-    return () => {
-      firebase.auth.onAuthStateChanged((user) => {
-        user ? setAuthUser(user) : setAuthUser(null);
-      });
-    };
-  }, [firebase.auth]);
-
-  
-  return (
-    <AuthUserContext.Provider value={{ authUser }}>
-      <WrappedComponent {...otherProps} />
-    </AuthUserContext.Provider>
-  );
+const withAuthentication = (Component) => {
+  class WithAuthentication extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = {
+        authUser: null,
+      };
+    }
+    componentDidMount() {
+      this.listener = this.props.firebase.auth.onAuthStateChanged(
+        (authUser) => {
+          authUser
+            ? this.setState({ authUser })
+            : this.setState({ authUser: null });
+        }
+      );
+    }
+    componentWillUnmount() {
+      this.listener();
+    }
+    render() {
+      return (
+        <AuthUserContext.Provider value={this.state.authUser}>
+          <Component {...this.props} />
+        </AuthUserContext.Provider>
+      );
+    }
+  }
+  return withFirebase(WithAuthentication);
 };
 export default withAuthentication;
+//duda aqui 49
