@@ -4,6 +4,7 @@ import { compose } from "recompose";
 import { SIGN_UP, HOME } from "../../constants/routes";
 import { withFirebase } from "../Firebase/context";
 import { Link, withRouter } from "react-router-dom";
+import * as ROLES from "../../constants/roles";
 
 import "./Sign-Up.scss";
 
@@ -22,10 +23,18 @@ const SignUpFormBase = ({ history, firebase }) => {
     email: "",
     passwordOne: "",
     passwordTwo: "",
+    isAdmin: false,
     error: null,
   };
   const [userCredentials, setUserCredentials] = useState(initialState);
-  const { username, email, passwordOne, passwordTwo, error } = userCredentials;
+  const {
+    username,
+    email,
+    passwordOne,
+    passwordTwo,
+    error,
+    isAdmin,
+  } = userCredentials;
 
   const isInvalid =
     passwordOne !== passwordTwo ||
@@ -36,9 +45,18 @@ const SignUpFormBase = ({ history, firebase }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const roles = {};
+
+    if (isAdmin) {
+      roles[ROLES.ADMIN] = ROLES.ADMIN;
+    }
+
     firebase
       .doCreateUserWithEmailAndPassword(email, passwordOne)
       .then((authUser) => {
+        return firebase.user(authUser.user.uid).set({ username, email, roles });
+      })
+      .then(() => {
         setUserCredentials(initialState);
         history.push(HOME);
       })
@@ -51,6 +69,11 @@ const SignUpFormBase = ({ history, firebase }) => {
     const { name, value } = e.target;
 
     setUserCredentials({ ...userCredentials, [name]: value });
+  };
+
+  const onChangeCheckbox = (e) => {
+    const { name, checked } = e.target;
+    setUserCredentials({ ...userCredentials, [name]: checked });
   };
 
   return (
@@ -83,6 +106,15 @@ const SignUpFormBase = ({ history, firebase }) => {
         type="password"
         placeholder="Confirm Password"
       />
+      <label>
+        Admin:
+        <input
+          name="isAdmin"
+          type="checkbox"
+          checked={isAdmin}
+          onChange={onChangeCheckbox}
+        />
+      </label>
       <button
         disabled={isInvalid}
         type="submit"

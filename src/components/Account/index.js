@@ -9,7 +9,7 @@ const AccountPage = () => {
     <AuthUserContext.Consumer>
       {(authUser) => (
         <div className="account-page">
-          <h1>{authUser.email}</h1>
+          <h1> {authUser.email}</h1>
           <PasswordForgetForm />
           <PasswordChangeForm />
         </div>

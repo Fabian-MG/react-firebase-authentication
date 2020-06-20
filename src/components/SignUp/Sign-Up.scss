@@ -12,7 +12,7 @@
     color: #3b719f;
   }
   .sign-up-form {
-    width: 35%;
+    width: 400px;
     margin-top: 10px;
     border-radius: 6px;
     overflow: hidden;
@@ -28,6 +28,22 @@
 
       &:hover {
         background: darken(#fff, 10%);
+      }
+    }
+
+    label {
+      display: flex;
+      color: rgb(92, 90, 90);
+      font-size: 1rem;
+      font-weight: bold;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+      background: white;
+      width: 100%;
+
+      input {
+        width: 50px;
       }
     }
 
