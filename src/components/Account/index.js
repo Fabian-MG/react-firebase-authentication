@@ -1,9 +1,16 @@
 import React from "react";
 import { PasswordForgetForm } from "../PasswordForget";
 import PasswordChangeForm from "../PasswordChange";
-import { withAuthorization, AuthUserContext } from "../Session";
+import LoginManagement from "./LoginManagementBase";
+import {
+  withAuthorization,
+  AuthUserContext,
+  withEmailVerification,
+} from "../Session";
 
 import "./Account.scss";
+import { compose } from "recompose";
+
 const AccountPage = () => {
   return (
     <AuthUserContext.Consumer>
@@ -12,6 +19,7 @@ const AccountPage = () => {
           <h1> {authUser.email}</h1>
           <PasswordForgetForm />
           <PasswordChangeForm />
+          <LoginManagement authUser={authUser} />
         </div>
       )}
     </AuthUserContext.Consumer>
@@ -20,4 +28,7 @@ const AccountPage = () => {
 
 const condition = (authUser) => !!authUser;
 
-export default withAuthorization(condition)(AccountPage);
+export default compose(
+  withEmailVerification,
+  withAuthorization(condition)
+)(AccountPage);

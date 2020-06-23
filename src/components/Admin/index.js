@@ -5,6 +5,7 @@ import "./Admin.scss";
 import * as ROLES from "../../constants/roles";
 import { compose } from "recompose";
 import withAuthorization from "../Session/withAuthorization";
+import { withEmailVerification } from "../Session";
 
 const AdminPage = ({ firebase }) => {
   const [loading, setLoading] = useState(false);
@@ -61,4 +62,8 @@ const UserList = ({ users }) => (
 
 const condition = (authUser) => authUser && !!authUser.roles[ROLES.ADMIN];
 
-export default compose(withAuthorization(condition), withFirebase)(AdminPage);
+export default compose(
+  withEmailVerification,
+  withAuthorization(condition),
+  withFirebase
+)(AdminPage);

@@ -17,6 +17,16 @@ const SignUpPage = () => {
   );
 };
 
+const ERROR_CODE_ACCOUNT_EXISTS =
+  "auth/account-exists-with-different-credential";
+
+const ERROR_MSG_ACCOUNT_EXISTS = `
+An account with an E-Mail address to
+this social account already exists. Try to login from
+this account instead and associate your social accounts on
+your personal account page.
+`;
+
 const SignUpFormBase = ({ history, firebase }) => {
   const initialState = {
     username: "",
@@ -26,6 +36,7 @@ const SignUpFormBase = ({ history, firebase }) => {
     isAdmin: false,
     error: null,
   };
+
   const [userCredentials, setUserCredentials] = useState(initialState);
   const {
     username,
@@ -57,11 +68,17 @@ const SignUpFormBase = ({ history, firebase }) => {
         return firebase.user(authUser.user.uid).set({ username, email, roles });
       })
       .then(() => {
+        return firebase.doSendEmailVerification();
+      })
+      .then(() => {
         setUserCredentials(initialState);
         history.push(HOME);
       })
-      .catch((error) => {
-        setUserCredentials({ ...userCredentials, error });
+      .catch((err) => {
+        if (err.code === ERROR_CODE_ACCOUNT_EXISTS)
+          err.message = ERROR_MSG_ACCOUNT_EXISTS;
+
+        setUserCredentials({ ...userCredentials, error: err });
       });
   };
 

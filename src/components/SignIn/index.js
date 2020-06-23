@@ -14,11 +14,25 @@ const SignInPage = () => {
     <div className="sign-in-page">
       <h1>Sign In Page</h1>
       <SignInForm />
+      <div className="social-login-containers">
+        <SignInGoogle />
+        <SignInFacebook />
+      </div>
       <PasswordForgetLink />
       <SignUpLink />
     </div>
   );
 };
+
+const ERROR_CODE_ACCOUNT_EXISTS =
+  "auth/account-exists-with-different-credential";
+
+const ERROR_MSG_ACCOUNT_EXISTS = `
+An account with an E-Mail address to
+this social account already exists. Try to login from
+this account instead and associate your social accounts on
+your personal account page.
+`;
 
 const SignInFormBase = ({ history, firebase }) => {
   const initialState = {
@@ -80,7 +94,79 @@ const SignInFormBase = ({ history, firebase }) => {
   );
 };
 
+const SignInGoogleBase = ({ history, firebase }) => {
+  const [error, setError] = useState(null);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    firebase
+      .doSignInWithGoogle()
+      .then((socialAuthUser) => {
+        return firebase.user(socialAuthUser.user.uid).set({
+          username: socialAuthUser.user.displayName,
+          email: socialAuthUser.user.email,
+          roles: {},
+        });
+      })
+      .then(() => {
+        setError(null);
+        history.push(HOME);
+      })
+      .catch((err) => {
+        if (err.code === ERROR_CODE_ACCOUNT_EXISTS)
+          err.message = ERROR_MSG_ACCOUNT_EXISTS;
+
+        setError({err})
+      });
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <button className="social-login-btn google" type="submit" />
+      {error && <p>{error.message}</p>}
+    </form>
+  );
+};
+
+const SignInFacebookBase = ({ history, firebase }) => {
+  const [error, setError] = useState(null);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    firebase
+      .doSignInWithFacebook()
+      .then((socialAuthUser) => {
+        return firebase.user(socialAuthUser.user.uid).set({
+          username: socialAuthUser.additionalUserInfo.profile.displayName,
+          email: socialAuthUser.additionalUserInfo.profile.email,
+          roles: {},
+        });
+      })
+      .then(() => {
+        setError(null);
+        history.push(HOME);
+      })
+      .catch((err) => {
+        if (err.code === ERROR_CODE_ACCOUNT_EXISTS)
+          err.message = ERROR_MSG_ACCOUNT_EXISTS;
+
+        setError({err})
+      });
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <button className="social-login-btn facebook" type="submit" />
+      {error && <p>{error.message}</p>}
+    </form>
+  );
+};
+
 const SignInForm = compose(withRouter, withFirebase)(SignInFormBase);
+const SignInGoogle = compose(withRouter, withFirebase)(SignInGoogleBase);
+const SignInFacebook = compose(withRouter, withFirebase)(SignInFacebookBase);
 
 export default SignInPage;
 

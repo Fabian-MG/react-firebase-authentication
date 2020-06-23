@@ -7,43 +7,29 @@ const withAuthentication = (Component) => {
     constructor(props) {
       super(props);
       this.state = {
-        authUser: null,
+        authUser: JSON.parse(localStorage.getItem("rfauthUser")),
       };
     }
 
-    listener() {
-      this.props.firebase.auth.onAuthStateChanged((authUser) => {
-        if (authUser) {
-          this.props.firebase
-            .user(authUser.uid)
-            .once("value")
-            .then((snapshot) => {
-              const dbUser = snapshot.val();
-
-              if (!dbUser.roles) {
-                dbUser.roles = {};
-              }
-
-              authUser = {
-                uid: authUser.uid,
-                email: authUser.email,
-                ...dbUser,
-              };
-
-              this.setState({ authUser });
-            });
-        } else {
+    listenerT() {
+      this.props.firebase.onAuthUserListener(
+        (authUser) => {
+          localStorage.setItem("rfauthUser", JSON.stringify(authUser));
+          this.setState({ authUser });
+        },
+        () => {
           this.setState({ authUser: null });
         }
-      });
+      );
     }
-    
+
     componentDidMount() {
-      this.listener();
+      localStorage.removeItem("rfauthUser");
+      this.listenerT();
     }
 
     componentWillUnmount() {
-      this.listener();
+      this.listenerT();
     }
 
     render() {
@@ -57,4 +43,3 @@ const withAuthentication = (Component) => {
   return withFirebase(WithAuthentication);
 };
 export default withAuthentication;
-//duda aqui 49

@@ -1,6 +1,7 @@
 import app from "firebase/app";
 import "firebase/auth";
 import "firebase/database";
+import "firebaseui";
 
 const config = {
   apiKey: "AIzaSyCpFMXbm1n_BNdMy3WynNRDfXqKL6M-5uE",
@@ -14,18 +15,15 @@ const config = {
 
 class Firebase {
   constructor() {
-    try {
-      app.initializeApp(config);
-    } catch (err) {
-      // we skip the “already exists” message which is
-      // not an actual error when we’re hot-reloading
-      if (!/already exists/.test(err.message)) {
-        console.error("Firebase initialization error raised", err.stack);
-      }
-    }
+    app.initializeApp(config);
+
+    this.emailAuthProvider = app.auth.EmailAuthProvider;
 
     this.auth = app.auth();
     this.db = app.database();
+
+    this.googleProvider = new app.auth.GoogleAuthProvider();
+    this.facebookProvider = new app.auth.FacebookAuthProvider();
   }
 
   // **** Auth API ****
@@ -36,17 +34,24 @@ class Firebase {
   doSignInWithEmailAndPassword = (email, password) =>
     this.auth.signInWithEmailAndPassword(email, password);
 
+  doSignInWithGoogle = () => this.auth.signInWithPopup(this.googleProvider);
+
+  doSignInWithFacebook = () => this.auth.signInWithPopup(this.facebookProvider);
+
   doPasswordUpdate = (password) =>
     this.auth.currentUser.updatePassword(password);
 
-  doPasswordReset = (email) => this.auth.sendPasswordResetEmail(email);
+  doSendEmailVerification = () =>
+    this.auth.currentUser.sendEmailVerification({
+      url: 'http://localhost:3000',
+    });
 
+  doPasswordReset = (email) => this.auth.sendPasswordResetEmail(email);
   doSignOut = () => this.auth.signOut();
 
   // **** User API ****
 
   user = (uid) => this.db.ref(`users/${uid}`);
-
   users = () => this.db.ref("users");
 
   // **** Merge Auth and DB User API ****
@@ -60,19 +65,23 @@ class Firebase {
             const dbUser = snapshot.val();
             // default empty roles
 
-            if (dbUser.roles === null) {
-              console.log("no hay");
+            if (!dbUser.roles) {
               dbUser.roles = {};
             }
             // merge auth and db user
             authUser = {
               uid: authUser.uid,
               email: authUser.email,
+              emailVerified: authUser.emailVerified,
+              providerData: authUser.providerData,
               ...dbUser,
             };
+
+            //step when authUser is checked
             next(authUser);
           });
       } else {
+        //step when authUser is undefined
         fallback();
       }
     });
