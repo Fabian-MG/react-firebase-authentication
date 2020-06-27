@@ -17,6 +17,7 @@ class Firebase {
   constructor() {
     app.initializeApp(config);
 
+    this.serverValue = app.database.ServerValue;
     this.emailAuthProvider = app.auth.EmailAuthProvider;
 
     this.auth = app.auth();
@@ -43,7 +44,7 @@ class Firebase {
 
   doSendEmailVerification = () =>
     this.auth.currentUser.sendEmailVerification({
-      url: 'http://localhost:3000',
+      url: "http://localhost:3000",
     });
 
   doPasswordReset = (email) => this.auth.sendPasswordResetEmail(email);
@@ -86,6 +87,12 @@ class Firebase {
       }
     });
   };
+
+  // **** Message API ****
+
+  message = (uid) => this.db.ref(`messages/${uid}`);
+
+  messages = () => this.db.ref("messages");
 }
 
 export default Firebase;
